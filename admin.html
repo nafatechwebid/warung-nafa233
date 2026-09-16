@@ -1,1 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Warung Nafa233</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c0392b">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+<header class="topbar">
+  <h1>⚙️ Admin Warung Nafa233</h1>
+  <a id="waAdminBtnAdmin" href="#" target="_blank" class="wa-admin-btn">💬 WA Warung Nafa233</a>
+  <button id="btnKeluarAdmin" class="btn-secondary hidden" onclick="logoutAdmin()">Keluar</button>
+</header>
+
+<!-- ============ LOGIN ADMIN SEDERHANA ============ -->
+<section id="adminLoginBox" class="card login-card">
+  <h2>Login Admin</h2>
+  <p class="muted">Login pakai akun admin yang sudah dibuat di Supabase Authentication.</p>
+  <input type="email" id="adminEmail" placeholder="Email admin">
+  <input type="password" id="adminPass" placeholder="Password admin">
+  <button onclick="loginAdmin()">Masuk</button>
+  <div id="adminLoginError" class="error-text"></div>
+</section>
+
+<section id="adminPanel" class="hidden">
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="produk" onclick="gantiTabAdmin('produk')">📦 Produk</button>
+    <button class="tab-btn" data-tab="pesanan" onclick="gantiTabAdmin('pesanan')">🧾 Pesanan</button>
+    <button class="tab-btn" data-tab="pengaturan" onclick="gantiTabAdmin('pengaturan')">⚙️ Pengaturan</button>
+    <button class="tab-btn" data-tab="ulasan" onclick="gantiTabAdmin('ulasan')">⭐ Ulasan</button>
+  </nav>
+
+  <!-- ============ TAB PRODUK ============ -->
+  <div id="tabProduk" class="admin-tab">
+    <div class="card">
+      <h2>Tambah / Edit Produk</h2>
+      <p class="muted">Maksimal <span id="batasProdukTampil"></span> produk berbeda. Total saat ini: <strong id="jumlahProdukSaatIni">0</strong></p>
+      <input type="hidden" id="editId">
+      <label>Kategori</label>
+      <select id="fKategori" onchange="toggleSuhuField()">
+        <option value="makanan">Makanan</option>
+        <option value="minuman">Minuman</option>
+        <option value="mie_instan">Mie Instan</option>
+      </select>
+
+      <div id="suhuFieldBox">
+        <label>Suhu (khusus minuman)</label>
+        <select id="fSuhu">
+          <option value="hot">🔥 Hangat/Panas</option>
+          <option value="cold">🧊 Dingin</option>
+        </select>
+      </div>
+
+      <label>Nama Produk</label>
+      <input type="text" id="fNama" placeholder="Contoh: Es Teh Manis">
+
+      <label>Harga</label>
+      <input type="number" id="fHarga" placeholder="Contoh: 5000">
+
+      <label>Stok</label>
+      <input type="number" id="fStok" placeholder="Contoh: 20">
+
+      <label>Catatan Khusus Produk (opsional)</label>
+      <textarea id="fCatatan" placeholder="Contoh: level pedas bisa disesuaikan"></textarea>
+
+      <label>Gambar Produk (opsional)</label>
+      <input type="file" id="fGambar" accept="image/*">
+      <img id="previewGambar" class="preview-gambar-kecil hidden">
+
+      <label class="checkbox-label">
+        <input type="checkbox" id="fAktif" checked> Tampilkan di toko
+      </label>
+
+      <button onclick="simpanProduk()">Simpan Produk</button>
+      <button class="btn-secondary" onclick="resetFormProduk()">Batal Edit</button>
+      <div id="produkError" class="error-text"></div>
+    </div>
+
+    <div class="card">
+      <h2>Daftar Produk</h2>
+      <input type="text" id="cariProduk" placeholder="Cari produk..." oninput="renderProdukAdmin()">
+      <div id="listProdukAdmin"></div>
+    </div>
+  </div>
+
+  <!-- ============ TAB PESANAN ============ -->
+  <div id="tabPesanan" class="admin-tab hidden">
+    <div class="card">
+      <h2>Daftar Pesanan</h2>
+      <select id="filterStatusPesanan" onchange="renderPesananAdmin()">
+        <option value="semua">Semua status</option>
+        <option value="menunggu_bayar">Menunggu Bayar</option>
+        <option value="dibayar">Dibayar</option>
+        <option value="diproses">Diproses</option>
+        <option value="selesai">Selesai</option>
+        <option value="dibatalkan">Dibatalkan</option>
+      </select>
+      <div id="listPesananAdmin"></div>
+    </div>
+  </div>
+
+  <!-- ============ TAB PENGATURAN ============ -->
+  <div id="tabPengaturan" class="admin-tab hidden">
+    <div class="card">
+      <h2>QRIS Toko</h2>
+      <p class="muted">Upload gambar QRIS toko. Gambar ini akan tampil ke pelanggan saat memilih pembayaran QRIS, termasuk saat pembayaran tunai kadaluarsa.</p>
+      <input type="file" id="fQris" accept="image/*">
+      <img id="previewQris" class="qris-img hidden">
+      <button onclick="simpanQris()">Simpan QRIS</button>
+    </div>
+
+    <div class="card">
+      <h2>Data Rekening Bank (Opsional, maks. 2)</h2>
+      <h3>Rekening 1</h3>
+      <input type="text" id="bank1Nama" placeholder="Nama Bank (contoh: BCA)">
+      <input type="text" id="bank1Nomor" placeholder="Nomor Rekening">
+      <input type="text" id="bank1AtasNama" placeholder="Atas Nama">
+
+      <h3>Rekening 2</h3>
+      <input type="text" id="bank2Nama" placeholder="Nama Bank (contoh: BRI)">
+      <input type="text" id="bank2Nomor" placeholder="Nomor Rekening">
+      <input type="text" id="bank2AtasNama" placeholder="Atas Nama">
+
+      <button onclick="simpanRekening()">Simpan Rekening</button>
+      <div id="pengaturanSukses" class="muted"></div>
+    </div>
+  </div>
+
+  <!-- ============ TAB ULASAN ============ -->
+  <div id="tabUlasan" class="admin-tab hidden">
+    <div class="card">
+      <h2>Ulasan Pelanggan</h2>
+      <p class="muted">Rata-rata rating: <strong id="rataRating">-</strong> ⭐ dari <span id="jumlahUlasan">0</span> ulasan</p>
+      <div id="listUlasanAdmin"></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============ CHAT PENJUAL-PEMBELI ============ -->
+<div id="chatModalAdmin" class="modal hidden">
+  <div class="modal-content chat-modal-content">
+    <h2>💬 Chat Pesanan <span id="chatIdPesananAdmin"></span></h2>
+    <p class="muted" id="chatNamaPelangganAdmin"></p>
+    <div id="chatMessagesAdmin" class="chat-messages"></div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInputPesanAdmin" placeholder="Balas pesan..." onkeypress="if(event.key==='Enter') kirimChatAdmin()">
+      <button onclick="kirimChatAdmin()">Kirim</button>
+    </div>
+    <button class="btn-secondary" onclick="tutupChatAdmin()">Tutup</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="config.js?v=6"></script>
+<script src="common.js?v=6"></script>
+<script src="admin.js?v=6"></script>
+</body>
+</html>
