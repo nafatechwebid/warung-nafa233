@@ -15,3 +15,6 @@ const MAX_PRODUCTS = 100;
 
 // Nomor WhatsApp Warung Nafa233 (dipakai untuk tombol "Hubungi Admin")
 const NOMOR_WA_PEMILIK = "62895367093942"; // format: kode negara tanpa + dan tanpa 0 di depan
+
+// Lokasi warung di Google Maps (dipakai untuk arahan pembayaran tunai)
+const LOKASI_WARUNG_URL = "https://maps.app.goo.gl/m6Q4pQJLMAZZQaqR6";

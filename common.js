@@ -46,6 +46,13 @@ function labelSuhu(suhu) {
   return "";
 }
 
+function labelMetodeBayar(metode) {
+  if (metode === "tunai") return "Tunai";
+  if (metode === "qris") return "QRIS";
+  if (metode === "transfer") return "Transfer Bank";
+  return metode;
+}
+
 // Saran otomatis catatan khusus berdasarkan isi keranjang & jam ambil
 function buatCatatanKesiapan(items, jamAmbil) {
   const adaMinumanHot = items.some(i => i.kategori === KATEGORI.MINUMAN && i.suhu === SUHU.HOT);

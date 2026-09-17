@@ -316,7 +316,9 @@ async function setujuiPembayaranTunai(id) {
 }
 
 async function updateStatusPesanan(id, status) {
-  await sb.from("pesanan").update({ status }).eq("id", id);
+  const data = { status };
+  if (status === "selesai") data.selesai_pada = new Date().toISOString();
+  await sb.from("pesanan").update(data).eq("id", id);
 }
 
 // ---------- PENGATURAN ----------
